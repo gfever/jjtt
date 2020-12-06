@@ -1,0 +1,57 @@
+image: phpdocker/phpdocker:7.4
+
+stages:
+  - prepare
+  - test
+
+variables:
+  COMPOSER_ALLOW_SUPERUSER: "1"
+  COMPOSER_DISABLE_XDEBUG_WARN: "1"
+
+cache:
+  paths:
+    - vendor/
+
+env:
+  stage: prepare
+  script:
+    - cp .env.example .env
+  only:
+    - merge_requests
+    - master
+
+composer:
+  stage: prepare
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-composer
+    paths:
+      - vendor/
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - vendor/
+  only:
+    - merge_requests
+    - master
+
+codestyle:
+  stage: test
+  dependencies:
+    - composer
+  script:
+    - composer phpcs
+  only:
+    - merge_requests
+    - master
+
+phpunit:
+  stage: test
+  dependencies:
+    - composer
+  script:
+    - php artisan test
+  only:
+    - merge_requests
+    - master
