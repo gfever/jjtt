@@ -6,4 +6,5 @@
 * `php artisan migrate`
 
 Api will be available at http://localhost:8005
-Api documentation available here `/api/documentation`
+
+Api documentation will be available here `/api/documentation`
